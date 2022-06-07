@@ -43,12 +43,13 @@ export const Game = makeSprite({
       player2Y: 0,
     };
   },
-
+  //This is the loop in which the game is played. It refreshes at 60 frames per second
   loop({ state, device, getInputs }) {
     if (!state.loaded) return state;
 
-    const inputs = getInputs();
-    let { player1X, player1Y, player2X, player2Y } = state;
+    const inputs = getInputs(); //This reads the inputs of the keyboard and the mouse
+    let { player1X, player1Y, player2X, player2Y } = state; //These are the states used to update the position of your player objects (You can see how it's used at the render() function)
+    //inputs.keysDown[] is taking a String to identify the key pressed and recognizes that they key is pressed until it's released
     if (inputs.keysDown["ArrowUp"]) {
       device.audio("boop.wav").play();
       if (player1Y <= 150) {
@@ -77,7 +78,7 @@ export const Game = makeSprite({
     //   player1Y = inputs.pointer.y;
     // }
 
-    return {
+    return { //Returns the values from the loop
       loaded: true,
       player1X: player1X + (player1X - player1X) / 10,
       player1Y: player1Y + (player1Y - player1Y) / 10,
@@ -89,6 +90,7 @@ export const Game = makeSprite({
       // player2Y,
     };
   },
+  //Renders the scene
   render({ device, state }) {
     if (!state.loaded) {
       return [
@@ -128,6 +130,9 @@ export const Game = makeSprite({
       //     x: player.x,
       //   })
       // ),
+
+      //This is an object that is imported and created here. It gets its position from the state, which is
+      //updated in the loop (look at player.js and playerLife.js)
       Player({
         id: "Player1",
         x: state.player1X,
@@ -168,6 +173,7 @@ export const Game = makeSprite({
   },
 });
 
+//This function is not used. I am experimenting to create objects dynamically (See replay-bird example from tutorial)
 function newPlayer(device){
   const max = 150;
   const min = -150;

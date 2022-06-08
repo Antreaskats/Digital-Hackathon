@@ -35,7 +35,7 @@ const initialState = {
     y: 0,
     score: 0
   },
-  isGameOver: false,
+  isGameOver: false
 };
 
 
@@ -146,11 +146,15 @@ function newPlayer(device){
 }
 
 function spawnEnemy(enemies) {
-  if (enemies.length <= 5) {
-    let percentage = Math.random() * 10;
-    if (percentage > 5.0) {
+  if (enemies.length <= 10) {
+    if (enemies.length == 0) { // add first enemy
+      return {x: 400, y: 0, id: enemies.length};
+    }
+    let lastY = enemies[enemies.length-1].y;
+    if (enemies.length % 2 != 0) { // lower 
+      console.log("lower");
       return {x: 400, y: Math.random() * 150 * -1, id: enemies.length};
-    } else {
+    } else {// upper
       return {x: 400, y: Math.random() * 140, id: enemies.length};
     }
   }

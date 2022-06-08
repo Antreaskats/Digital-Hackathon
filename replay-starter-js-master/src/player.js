@@ -1,5 +1,5 @@
 import { makeSprite, t } from "@replay/core";
-
+ 
 export const Player = makeSprite({
   render(/*posX, posY*/) {
     return [

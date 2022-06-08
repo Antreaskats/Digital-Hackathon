@@ -1,7 +1,10 @@
+/* eslint-disable prettier/prettier */
 import { makeSprite, t } from "@replay/core";
 import { Player } from "./player";
 import { PlayerLife } from "./playerLife";
 import { Enemy } from "./enemy";
+
+let enemiesCount = 0;
 
 export const options = {
   dimensions: "scale-up",
@@ -52,13 +55,31 @@ export const Game = makeSprite({
   //This is the loop in which the game is played. It refreshes at 60 frames per second
   loop({ state, device, getInputs }) {
     if (!state.loaded) return state;
-
+    let i= 0;
+    let enemy;
     const inputs = getInputs(); //This reads the inputs of the keyboard and the mouse
     let { player1, enemies } = state; //These are the states used to update the position of your player objects (You can see how it's used at the render() function)
     //inputs.keysDown[] is taking a String to identify the key pressed and recognizes that they key is pressed until it's released
-    let enemy = spawnEnemy(enemies);
+
+    enemy = spawnEnemy(enemies);
     if (enemy != undefined)
       enemies = [...enemies, enemy];
+    if(enemies.length > 0){
+      for(i = 0; i < enemies.length; i++){
+        if(i == 0){
+        enemies[0].x += -1;
+        }
+        if(i > 0 && enemies[i-1].x < 250 ){
+          enemies[i].x += -1;
+        }
+      }
+    }
+    
+    enemies = [...enemies.filter(
+      (enemy) => enemy.x > -210
+      ),
+    ];
+  
     if (inputs.keysDown["ArrowUp"]) {
       device.audio("boop.wav").play();
       if (player1.y <= 150) {
@@ -146,16 +167,19 @@ function newPlayer(device){
 }
 
 function spawnEnemy(enemies) {
-  if (enemies.length <= 10) {
+    const enemiesLength = enemies.length;
+    enemiesCount++;
     if (enemies.length == 0) { // add first enemy
-      return {x: 400, y: 0, id: enemies.length};
+      return {x: 400, y: 0, id: enemiesCount-1};
     }
     let lastY = enemies[enemies.length-1].y;
-    if (enemies.length % 2 != 0) { // lower 
-      console.log("lower");
-      return {x: 400, y: Math.random() * 150 * -1, id: enemies.length};
-    } else {// upper
-      return {x: 400, y: Math.random() * 140, id: enemies.length};
+    if(enemiesLength > 0 && enemies[enemiesLength-1].x < 250){
+      if (enemiesCount % 2 != 0) { // lower 
+        console.log("lower");
+        return {x: 400, y: Math.random() * 150 * -1, id: enemiesCount-1};
+      } else {// upper
+        return {x: 400, y: Math.random() * 140, id: enemiesCount-1};
+      }
     }
-  }
+  
 };

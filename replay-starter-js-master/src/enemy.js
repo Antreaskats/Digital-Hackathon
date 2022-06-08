@@ -1,10 +1,10 @@
 import { makeSprite, t } from "@replay/core";
 
-export const Player = makeSprite({
+export const Enemy = makeSprite({
   render(/*posX, posY*/) {
     return [
       t.image({
-        testId: "goku",
+        testId: "icon",
         fileName: "goku.png",
         width: 100,
         height: 50,

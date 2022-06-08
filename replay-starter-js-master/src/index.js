@@ -1,6 +1,8 @@
 import { makeSprite, t } from "@replay/core";
 import { Player } from "./player";
 import { PlayerLife } from "./playerLife";
+import { Enemy } from "./enemy";
+
 export const options = {
   dimensions: "scale-up",
 };
@@ -25,72 +27,58 @@ export const gameProps = {
   },
 };
 
+const initialState = {
+  enemies: [],
+  player1: {
+    id: "Player1",
+    x: -250,
+    y: 0,
+    score: 0
+  },
+  isGameOver: false
+};
+
+
 export const Game = makeSprite({
   init({ updateState, preloadFiles }) {
     preloadFiles({
       audioFileNames: ["boop.wav"],
-      imageFileNames: ["goku.png", "playerLife.png", "Namek.png"],
+      imageFileNames: ["goku.png", "playerLife.png", "Namek.png", "icon.png"],
     }).then(() => {
       updateState((state) => ({ ...state, loaded: true }));
     });
-
-    return {
-      loaded: false,
-      //players: [newPlayer()],
-      player1X: -250,
-      player1Y: 0,
-      player2X: +150,
-      player2Y: 0,
-    };
+    return initialState;
   },
   //This is the loop in which the game is played. It refreshes at 60 frames per second
   loop({ state, device, getInputs }) {
     if (!state.loaded) return state;
 
     const inputs = getInputs(); //This reads the inputs of the keyboard and the mouse
-    let { player1X, player1Y, player2X, player2Y } = state; //These are the states used to update the position of your player objects (You can see how it's used at the render() function)
+    let { player1, enemies } = state; //These are the states used to update the position of your player objects (You can see how it's used at the render() function)
     //inputs.keysDown[] is taking a String to identify the key pressed and recognizes that they key is pressed until it's released
+    let enemy = spawnEnemy(enemies);
+    if (enemy != undefined)
+      enemies = [...enemies, enemy];
     if (inputs.keysDown["ArrowUp"]) {
       device.audio("boop.wav").play();
-      if (player1Y <= 150) {
-        player1Y += 5;
+      if (player1.y <= 150) {
+        player1.y += 5;
       }
     }
     if (inputs.keysDown["ArrowDown"]) {
       device.audio("boop.wav").play();
-      if (player1Y >= -150) {
-        player1Y -= 5;
+      if (player1.y >= -150) {
+        player1.y -= 5;
       }
     }
 
-    if (inputs.keysDown["ArrowRight"]) {
-      device.audio("boop.wav").play();
-      player2X += 5;
-    }
-    if (inputs.keysDown["ArrowLeft"]) {
-      device.audio("boop.wav").play();
-      player2X -= 5;
-    }
-
-    // if (inputs.pointer.justPressed) {
-    //   device.audio("boop.wav").play();
-    //   player1X = inputs.pointer.x;
-    //   player1Y = inputs.pointer.y;
-    // }
-
-    return { //Returns the values from the loop
+    return { 
+      ...state,
       loaded: true,
-      player1X: player1X + (player1X - player1X) / 10,
-      player1Y: player1Y + (player1Y - player1Y) / 10,
-      player2X: player2X + (player2X - player2X) / 10,
-      player2Y: player2Y + (player2Y - player2Y) / 10,
-      // player1X,
-      // player1Y,
-      // player2X,
-      // player2Y,
+      player1,
+      enemies
     };
   },
-  //Renders the scene
   render({ device, state }) {
     if (!state.loaded) {
       return [
@@ -101,47 +89,15 @@ export const Game = makeSprite({
       ];
     }
     return [
-      // t.text({
-      //   color: "red",
-      //   text: "Hello Replay! To get started, edit src/index.js",
-      //   y: 50,
-      // }),
-      // t.image({
-      //   testId: "icon",
-      //   x: state.pos1X,
-      //   y: state.pos1Y,
-      //   fileName: "goku.png",
-      //   width: 100,
-      //   height: 50,
-      // }),
       t.image({
-
         fileName: "Namek.png",
-
         width: device.size.width,
-
         height: device.size.height,
-
-      }),
-      // ...state.players.map((player, index) =>
-      //   Player({
-      //     id: `player-${index}`,
-      //     player,
-      //     x: player.x,
-      //   })
-      // ),
-
-      //This is an object that is imported and created here. It gets its position from the state, which is
-      //updated in the loop (look at player.js and playerLife.js)
-      Player({
-        id: "Player1",
-        x: state.player1X,
-        y: state.player1Y,
       }),
       Player({
-        id: "Player2",
-        x: state.player2X,
-        y: state.player2Y,
+        id: state.player1.id,
+        x: state.player1.x,
+        y: state.player1.y,
       }),
       PlayerLife({
         id: "life1",
@@ -163,6 +119,9 @@ export const Game = makeSprite({
         x: -350,
         y: -100,
       }),
+      ...state.enemies.map(({ x, y, id }) =>
+        Enemy({ x, y, id: "enemy" + id })
+      ),
       t.rectangle({
         height: device.size.height,
         x: -210,
@@ -185,3 +144,18 @@ function newPlayer(device){
     y: height,
   };
 }
+
+function spawnEnemy(enemies) {
+  if (enemies.length <= 10) {
+    if (enemies.length == 0) { // add first enemy
+      return {x: 400, y: 0, id: enemies.length};
+    }
+    let lastY = enemies[enemies.length-1].y;
+    if (enemies.length % 2 != 0) { // lower 
+      console.log("lower");
+      return {x: 400, y: Math.random() * 150 * -1, id: enemies.length};
+    } else {// upper
+      return {x: 400, y: Math.random() * 140, id: enemies.length};
+    }
+  }
+};

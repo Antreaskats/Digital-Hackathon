@@ -1,15 +1,16 @@
 import { makeSprite, t } from "@replay/core";
 
+export const enemyWidth = 100;
+export const enemyHeight = 50;
+
 export const Enemy = makeSprite({
-  render(/*posX, posY*/) {
+  render() {
     return [
       t.image({
         testId: "icon",
         fileName: "goku.png",
-        width: 100,
-        height: 50,
-        // x: posX,
-        // y: posY,
+        width: enemyWidth,
+        height: enemyHeight,
       }),
     ];
   },

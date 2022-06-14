@@ -32,7 +32,7 @@ export const gameProps = {
   },
   defaultFont: {
     family: "Courier",
-    size: 10,
+    size: 30,
   },
 };
 
@@ -279,6 +279,7 @@ function didWaveHitTarget(energyWaves, enemies){
       if(energyX > enemies[i].x && ((energyBottom < enemyTop && energyBottom > enemyBottom-10 ) || (energyTop > enemyBottom && energyTop < enemyTop))){ //&& energyY > enemyBottom && energyY < enemyTop){
         energyWaves[0].targetHit = true;
         enemies[i].targetHit = true;
+        activateNumber(Math.trunc(Math.random() * 10));        
       }
     }
   }
@@ -300,7 +301,6 @@ function spawnEnemy(enemies) {
     let lastY = enemies[enemies.length-1].y;
     if(enemiesLength > 0 && enemies[enemiesLength-1].x < 250){
       if (enemiesCount % 2 != 0) { // lower 
-        console.log("lower");
         return {x: 400, y: Math.random() * 150 * -1, id: enemiesCount-1, targetHit: false, enemyHitWall: false};
       } else {// upper
         return {x: 400, y: Math.random() * 140, id: enemiesCount-1, targetHit: false, enemyHitWall: false};
